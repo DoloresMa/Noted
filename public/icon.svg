@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" role="img" aria-label="情绪瞬间图标">
+  <rect width="512" height="512" rx="120" fill="#f0e8dc" />
+  <circle cx="196" cy="224" r="56" fill="#9cb7a8" opacity="0.95" />
+  <path d="M328 172c36 0 66 30 66 66s-30 66-66 66c-12 0-24-3-34-9-5 31-32 55-64 55-36 0-66-30-66-66s30-66 66-66c11 0 22 3 32 8 5-31 32-54 66-54z" fill="#b39a95" opacity="0.9"/>
+</svg>
