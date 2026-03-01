@@ -22,6 +22,7 @@ export default function HomePage() {
   const [mode, setMode] = useState<FlowMode>('idle')
   const [text, setText] = useState('')
   const [intensity, setIntensity] = useState(5)
+  const [reviewTomorrow, setReviewTomorrow] = useState(false)
   const [tag, setTag] = useState('')
   const [toast, setToast] = useState('')
   const [savedPulse, setSavedPulse] = useState(false)
@@ -36,6 +37,8 @@ export default function HomePage() {
     }
 
     const now = Date.now()
+    const tomorrowAtSameTime = new Date(now)
+    tomorrowAtSameTime.setDate(tomorrowAtSameTime.getDate() + 1)
 
     await addEntry({
       id: createId(),
@@ -44,6 +47,14 @@ export default function HomePage() {
       text: trimmed,
       intensity: mode === 'bad' ? intensity : undefined,
       tag: mode === 'good' && tag ? tag : undefined,
+      followUp:
+        mode === 'bad' && reviewTomorrow
+          ? {
+              active: false,
+              nextCheckAt: tomorrowAtSameTime.getTime(),
+              checkins: [],
+            }
+          : undefined,
       createdAt: now,
     })
 
@@ -60,6 +71,7 @@ export default function HomePage() {
       setText('')
       setTag('')
       setIntensity(5)
+      setReviewTomorrow(false)
       setToast('')
     }, 2000)
   }
@@ -80,7 +92,10 @@ export default function HomePage() {
           <button
             type="button"
             className="w-full rounded-3xl border border-line bg-card px-6 py-8 text-left text-xl text-ink shadow-soft transition active:scale-[0.99]"
-            onClick={() => setMode('bad')}
+            onClick={() => {
+              setReviewTomorrow(false)
+              setMode('bad')
+            }}
           >
             🌧 现在有点难受
           </button>
@@ -91,7 +106,14 @@ export default function HomePage() {
 
   return (
     <section className={`space-y-5 ${savedPulse ? 'soft-fade-in' : ''}`}>
-      <button type="button" className="text-sm text-soft" onClick={() => setMode('idle')}>
+      <button
+        type="button"
+        className="text-sm text-soft"
+        onClick={() => {
+          setReviewTomorrow(false)
+          setMode('idle')
+        }}
+      >
         返回
       </button>
       <h1 className="text-2xl text-ink">{mode === 'good' ? '这一刻' : '把它留在这里'}</h1>
@@ -127,7 +149,7 @@ export default function HomePage() {
               )
             })}
           </div>
-          {tag === '安全感' && (
+          {tag && (
             <p className="text-xs text-soft">这些标签是“感觉来源” 不是情绪本身</p>
           )}
         </div>
@@ -147,6 +169,16 @@ export default function HomePage() {
             onChange={(event) => setIntensity(Number(event.target.value))}
             className="w-full accent-bad"
           />
+          <label className="mt-1 flex items-center gap-2 text-sm text-soft" htmlFor="review-tomorrow">
+            <input
+              id="review-tomorrow"
+              type="checkbox"
+              checked={reviewTomorrow}
+              onChange={(event) => setReviewTomorrow(event.target.checked)}
+              className="h-4 w-4 rounded border-line accent-ink"
+            />
+            明天回顾
+          </label>
         </div>
       )}
 

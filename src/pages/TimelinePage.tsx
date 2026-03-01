@@ -40,6 +40,10 @@ function getDotMarks(group?: DayGroup): string[] {
   return all.slice(0, 3)
 }
 
+function markIcon(type: string): string {
+  return type === 'bad' ? '🌧' : '🌤'
+}
+
 function getLatestCheckin(entry: Entry): EntryCheckin | undefined {
   const checkins = entry.followUp?.checkins
   if (!checkins || checkins.length === 0) {
@@ -49,6 +53,16 @@ function getLatestCheckin(entry: Entry): EntryCheckin | undefined {
   return checkins.reduce((latest, current) =>
     current.timestamp > latest.timestamp ? current : latest,
   )
+}
+
+function formatCheckAt(timestamp: number): string {
+  const date = new Date(timestamp)
+  const y = date.getFullYear()
+  const m = String(date.getMonth() + 1).padStart(2, '0')
+  const d = String(date.getDate()).padStart(2, '0')
+  const h = String(date.getHours()).padStart(2, '0')
+  const min = String(date.getMinutes()).padStart(2, '0')
+  return `${y}-${m}-${d} ${h}:${min}`
 }
 
 export default function TimelinePage() {
@@ -194,7 +208,7 @@ export default function TimelinePage() {
                 <div className="mt-1 flex items-center gap-1 text-xs">
                   {dots.map((dot, index) => (
                     <span key={`${key}-${dot}-${index}`} className={dot === 'bad' ? 'text-bad' : 'text-good'}>
-                      {dot === 'bad' ? '●' : '○'}
+                      {markIcon(dot)}
                     </span>
                   ))}
                   {overflow > 0 && <span className="text-soft">+</span>}
@@ -247,6 +261,9 @@ export default function TimelinePage() {
                         {hasTodayIntensity && <p className="text-sm text-soft">今天：{todayIntensity}</p>}
                         {hasTodayIntensity && typeof entry.intensity === 'number' && (
                           <p className="mt-1 text-sm text-ink">昨天：{entry.intensity} 今天：{todayIntensity}</p>
+                        )}
+                        {entry.followUp?.nextCheckAt && (
+                          <p className="mt-1 text-xs text-soft">明天回顾：{formatCheckAt(entry.followUp.nextCheckAt)}</p>
                         )}
 
                         <button
